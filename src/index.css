@@ -8,8 +8,8 @@ body {
   font-family: 'montseratt', sans-serif;
 }
 
-.App {
-  background-image: url('./img/desktop-wallpaper-sky-aesthetic-by-ooika-on-warm-vintage-vibes-vintage-orange-aesthetic.jpg');
+.app {
+  background-image: url('./img/weather.jpg');
   background-size: cover;
   background-position: bottom;
   transition: 0.4 ease;
@@ -17,8 +17,11 @@ body {
 }
 
 .app.warm {
-  background-image: url(./img/OIP_7.jpeg);
+  background-image: url(./img/warm.jpeg);
 
+}
+.app.cold{
+  background-image: url(./img/cold.jpeg);
 }
 
 main {
@@ -75,7 +78,7 @@ main {
 
 .weather-box {
   text-align: center;
-  ;
+  
 }
 
 .weather-box .temp {
