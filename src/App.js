@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './index.css';
 
 const api = {
@@ -11,12 +11,63 @@ function App() {
   const [weather, setWeather] = useState('');
   const [placeholder, setPlaceholder] = useState('Type anything to search');
 
+  useEffect(() => {
+    // Get the current location when the component mounts
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(showPosition, showError);
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+  }, []);
+
+  const showPosition = (position) => {
+    const latitude = position.coords.latitude;
+    const longitude = position.coords.longitude;
+    fetchWeatherByCoords(latitude, longitude);
+  }
+
+  const showError = (error) => {
+    switch(error.code) {
+      case error.PERMISSION_DENIED:
+        alert("User denied the request for Geolocation.");
+        break;
+      case error.POSITION_UNAVAILABLE:
+        alert("Location information is unavailable.");
+        break;
+      case error.TIMEOUT:
+        alert("The request to get user location timed out.");
+        break;
+      case error.UNKNOWN_ERROR:
+        alert("An unknown error occurred.");
+        break;
+    }
+  }
+
+  const fetchWeatherByCoords = (lat, lon) => {
+    fetch(`${api.base}weather?lat=${lat}&lon=${lon}&units=metric&APPID=${api.key}`)
+      .then(res => res.json())
+      .then(result => {
+        if (result.cod !== 200) {
+          setPlaceholder('Unable to retrieve weather for your location.');
+          setWeather('');
+        } else {
+          setWeather(result);
+          setPlaceholder('Type anything to search');
+        }
+      })
+      .catch(err => {
+        setPlaceholder('An error occurred.');
+        setWeather('');
+        console.error(err);
+      });
+  }
+
   const Search = evt => {
     if (evt.key === "Enter") {
       fetch(`${api.base}weather?q=${query}&units=metric&APPID=${api.key}`)
         .then(res => res.json())
         .then(result => {
-          if (result.cod !== 200) {  // Check if the result code is not 200 (which means success)
+          if (result.cod !== 200) {
             setPlaceholder('No place by that name.');
             setWeather('');
           } else {
@@ -72,6 +123,9 @@ function App() {
               </div>
               <div className='weather'>{weather.weather[0].main}</div>
             </div>
+          <div>
+            {fetchWeatherByCoords.geolocation}
+          </div>
           </div>
         ) : ''}
       </main>
